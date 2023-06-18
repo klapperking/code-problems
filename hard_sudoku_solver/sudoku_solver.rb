@@ -60,16 +60,34 @@ def get_next_empty(puzzle)
 end
 
 def get_last_filled_pos(puzzle)
-  idx = puzzle.flatten.reverse.index { |n| !n.zero? }
-  helper  = (idx / 9).floor
-  return [helper - 1, idx - helper - 1]
+  # read puzzle from the back to get idx of first non-zero number
+  idx = 63 - puzzle.flatten.reverse.index { |n| !n.zero? }
+
+  # row of original puzzle
+  row = (idx / 9).floor + 1
+  col = idx - (row - 1) * 9 + 8
+
+  return [row, col]
 end
 
+def solve(puzzle, base_possibilities, solution_counter = 0)
 
-def solve(puzzle, base_possibilities)
-  # return if solved
-  return puzzle unless puzzle.flatten.include?(0)
+  # if solution found, continue searching
+  unless puzzle.flatten.include?(0)
+    # increment solution_counter
+    solution_counter += 1
 
+    # Error if another solution can be found
+    raise StandardError.new("Multiple solutions") if solution_counter > 1
+
+    # keep solution
+    solution = Marshal.load(Marshal.dump(puzzle))
+
+    # remove last non-zero from grid and from the possibility hash # TODO Does it need to added elsewhere? (No?)
+    i_row, i_col = get_last_filled_pos(puzzle)
+    base_possibilities["#{i_row}#{i_col}".to_sym].delete(puzzle[i_row][i_col])
+    puzzle[i_row][i_col] = 0
+  end
   # find next empty
   i_row, i_col = get_next_empty(puzzle)
 
@@ -78,17 +96,16 @@ def solve(puzzle, base_possibilities)
     # if possibility can still go into square, fill it and start recursion call
     if is_possible?(puzzle, i_row, i_col, n)
       puzzle[i_row][i_col] = n
-      return puzzle if solve(puzzle, base_possibilities)
+      return puzzle if solve(puzzle, base_possibilities, solution_counter)
 
       # if future calls come back here, n was wrong, reset field and return
       puzzle[i_row][i_col] = 0
 
     end
   end
+
   return nil
 end
-
-# TODO Account for multiple solution sudokus.
 
 puzzle = [[0, 0, 6, 1, 0, 0, 0, 0, 8],
           [0, 8, 0, 0, 9, 0, 0, 3, 0],
@@ -100,8 +117,6 @@ puzzle = [[0, 0, 6, 1, 0, 0, 0, 0, 8],
           [0, 2, 0, 0, 5, 0, 0, 8, 0],
           [1, 0, 0, 0, 0, 2, 5, 0, 0]]
 
-SOLUTION_COUNTER = 0
-
 def sudoku_solver(puzzle)
   # raise Errors if invalid grid supplied
   raise StandardError.new("Invalid Grid") if puzzle.flatten.reject(&:zero?).size <= 17
@@ -110,15 +125,14 @@ def sudoku_solver(puzzle)
 
   raise StandardError.new("Invalid Grid") if puzzle.flatten.length != 81
 
-  # initial pass to reduce possibilties
+  # initial pass to reduce possibilities
   base_possibilities = base_possibilities(puzzle)
 
-  solve(puzzle, base_possibilities)
+  solution = solve(puzzle, base_possibilities)
+  p solution
+  return solution
 end
 
 StackProf.run(mode: :cpu, out: 'stackprof.dump') do
   sudoku_solver(puzzle)
 end
-
-
-## TODO: Account for multiple solutions
