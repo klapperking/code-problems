@@ -6,17 +6,9 @@ class SudokuSolver
     @puzzle = puzzle
     @solution = nil
     @solution_counter = 0
-    find_solution()
   end
 
   def find_solution
-    # Guard clause Errors for various invalids (too lttle info, invalid entries, wrong format)
-    raise 'Invalid Grid - Less than 17 given' if @puzzle.flatten.reject(&:zero?).size <= 17
-
-    raise 'Invalid Grid - Invalid numbers in grid' if @puzzle.flatten.any? { |x| x.negative? || x > 9 }
-
-    raise 'Invalid Grid - Wrong format' if @puzzle.flatten.length != 81
-
     # initial pass to reduce fill-possibilities
     @base_possibilities = get_base_possibilites(@puzzle)
 
@@ -147,6 +139,20 @@ puzzle = [[0, 0, 6, 1, 0, 0, 0, 0, 8],
           [1, 0, 0, 0, 0, 2, 5, 0, 0]]
 
 
-solver = SudokuSolver.new(puzzle)
+def sudoku_solver(puzzle)
+  # Guard clause Errors for various invalids (too lttle info, invalid entries, wrong format)
+  raise 'Invalid Grid - Less than 17 given' if puzzle.flatten.reject(&:zero?).size <= 17
 
-solver.find_solution()
+  raise 'Invalid Grid - Invalid numbers in grid' if puzzle.flatten.any? { |x| x.negative? || x > 9 }
+
+  raise 'Invalid Grid - Wrong format' if puzzle.flatten.length != 81
+
+  solver = SudokuSolver.new(puzzle)
+  solver.find_solution()
+  return solver.solution
+end
+
+sudoku_solver(puzzle)
+
+
+## TODO: Multiple solutions is too slow!
