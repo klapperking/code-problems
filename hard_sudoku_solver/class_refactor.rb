@@ -1,3 +1,5 @@
+require 'stackprof'
+
 class SudokuSolver
   attr_reader :solution, :solution_counter
 
@@ -16,10 +18,7 @@ class SudokuSolver
     solve()
 
     # exit if unsolvable
-    return nil unless @solution
-
-    # solve is found - check if mulitple solutions exit
-    raise 'Invalid Grid - Multiple Solutions' if @solution_counter > 1
+    raise 'Unsolvable' unless @solution
 
     return @solution
   end
@@ -95,20 +94,35 @@ class SudokuSolver
     return pos
   end
 
+  def is_filled?(puzzle)
+    @puzzle.reverse.each do |row|
+      row.each do |num|
+        return false if num.zero?
+      end
+    end
+    return true
+  end
+
+
   def solve
     # if solution found, continue searching
-    unless @puzzle.flatten.include?(0)
+    if is_filled?(@puzzle)
       # increment solution_counter
       @solution_counter += 1
+
+      # solve is found - check if mulitple solutions exit
+      raise 'Invalid Grid - Multiple Solutions' if @solution_counter > 1
 
       # keep solution
       @solution = Marshal.load(Marshal.dump(@puzzle))
 
-      # remove last non-zero from grid and from the possibility hash # TODO Does it need to added elsewhere? (No?)
-      i_row, i_col = get_last_filled_pos()
-      @base_possibilities["#{i_row}#{i_col}".to_sym]&.delete(@puzzle[i_row][i_col])
-      @puzzle[i_row][i_col] = 0
-      return true
+      # remove last non-zero from grid and from the possibility hash -- This might be the issue here!
+      ## TODO: Refactor!
+      last_filled_idx = @base_possibilities.keys.last
+      active_number = @puzzle[last_filled_idx[0].to_i][last_filled_idx[1].to_i]
+      @base_possibilities[last_filled_idx].delete(active_number)
+      @puzzle[last_filled_idx[0].to_i][last_filled_idx[1].to_i] = 0
+      # return true
     end
     # find next empty
     i_row, i_col = get_next_empty()
@@ -138,8 +152,17 @@ puzzle = [[0, 0, 6, 1, 0, 0, 0, 0, 8],
           [0, 2, 0, 0, 5, 0, 0, 8, 0],
           [1, 0, 0, 0, 0, 2, 5, 0, 0]]
 
+puzzle2 = [[8, 0, 0, 0, 0, 0, 0, 0, 0],
+           [0, 0, 3, 6, 0, 0, 0, 0, 0],
+           [0, 7, 0, 0, 9, 0, 2, 0, 0],
+           [0, 5, 0, 0, 0, 7, 0, 0, 0],
+           [0, 0, 0, 0, 4, 5, 7, 0, 0],
+           [0, 0, 0, 1, 0, 0, 0, 3, 0],
+           [0, 0, 1, 0, 0, 0, 0, 6, 8],
+           [0, 0, 8, 5, 0, 0, 0, 1, 0],
+           [0, 9, 0, 0, 0, 0, 4, 0, 0]]
 
-def sudoku_solver(puzzle)
+          def sudoku_solver(puzzle)
   # Guard clause Errors for various invalids (too lttle info, invalid entries, wrong format)
   raise 'Invalid Grid - Less than 17 given' if puzzle.flatten.reject(&:zero?).size <= 17
 
@@ -149,10 +172,14 @@ def sudoku_solver(puzzle)
 
   solver = SudokuSolver.new(puzzle)
   solver.find_solution()
+  p solver.solution
   return solver.solution
 end
 
-sudoku_solver(puzzle)
+StackProf.run(mode: :cpu, out: 'stackprof.dump') do
+  sudoku_solver(puzzle2)
+end
 
-
-## TODO: Multiple solutions is too slow!
+# Refactor Multiple check into a separate solve() call with number removal (no is_filled? checks)
+# Test: Can get_next empty be fasteR? --> Start at last filled position! (pass from solve)
+# Test: getting square numbers - Can this be much fasteR? ()
