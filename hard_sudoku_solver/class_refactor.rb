@@ -19,8 +19,6 @@ class SudokuSolver
 
     # exit if unsolvable
     raise 'Unsolvable' unless @solution
-
-    return @solution
   end
 
   private
@@ -45,9 +43,13 @@ class SudokuSolver
     return possibilities
   end
 
-  def get_next_empty
+  def get_next_empty(prev_row = nil)
     # iterate grid to find empty square
-    (0..8).each do |i_row|
+    prev_row ||= 0
+
+    # Update this! 0,8 jumps to 1, 8 (instead of 1, 1) -- Fix! ; DK how to fix that;
+    # Input is [0, 8] , go to [1, 0] and continue - how?
+    (prev_row..8).each do |i_row|
       (0..8).each do |i_col|
         return [i_row, i_col] if @puzzle[i_row][i_col] == 0
       end
@@ -55,20 +57,10 @@ class SudokuSolver
     return nil
   end
 
-  def get_last_filled_pos()
-    # read puzzle from the back to get idx of first non-zero number
-    idx = 63 - @puzzle.flatten.reverse.index { |n| !n.zero? }
-
-    # row of original puzzle
-    row = (idx / 9).floor + 1
-    col = idx - (row - 1) * 9 + 8
-
-    return [row, col]
-  end
-
   def is_possible?(y, x, n)
     # check row and col
     (0..8).each { |i| return false if @puzzle[y][i] == n || @puzzle[i][x] == n }
+
     # check 3x3
     x0 = (x / 3).floor * 3
     y0 = (y / 3).floor * 3
@@ -103,8 +95,7 @@ class SudokuSolver
     return true
   end
 
-
-  def solve
+  def solve(prev_row = nil)
     # if solution found, continue searching
     if is_filled?(@puzzle)
       # increment solution_counter
@@ -116,23 +107,24 @@ class SudokuSolver
       # keep solution
       @solution = Marshal.load(Marshal.dump(@puzzle))
 
-      # remove last non-zero from grid and from the possibility hash -- This might be the issue here!
-      ## TODO: Refactor!
+      # remove last filled number from grid and the positions possibilities, then continue
+
       last_filled_idx = @base_possibilities.keys.last
       active_number = @puzzle[last_filled_idx[0].to_i][last_filled_idx[1].to_i]
+
       @base_possibilities[last_filled_idx].delete(active_number)
       @puzzle[last_filled_idx[0].to_i][last_filled_idx[1].to_i] = 0
-      # return true
     end
+
     # find next empty
-    i_row, i_col = get_next_empty()
+    i_row, i_col = get_next_empty(prev_row)
 
     # attempt each possibility for given square
     @base_possibilities["#{i_row}#{i_col}".to_sym].each do |n|
       # if possibility can still go into square, fill it and start recursion call
       if is_possible?(i_row, i_col, n)
         @puzzle[i_row][i_col] = n
-        return true if solve()
+        return true if solve(prev_row = i_row)
 
         # if future calls come back here, n was wrong, reset field and return
         @puzzle[i_row][i_col] = 0
@@ -162,7 +154,7 @@ puzzle2 = [[8, 0, 0, 0, 0, 0, 0, 0, 0],
            [0, 0, 8, 5, 0, 0, 0, 1, 0],
            [0, 9, 0, 0, 0, 0, 4, 0, 0]]
 
-          def sudoku_solver(puzzle)
+def sudoku_solver(puzzle)
   # Guard clause Errors for various invalids (too lttle info, invalid entries, wrong format)
   raise 'Invalid Grid - Less than 17 given' if puzzle.flatten.reject(&:zero?).size <= 17
 
@@ -181,5 +173,8 @@ StackProf.run(mode: :cpu, out: 'stackprof.dump') do
 end
 
 # Refactor Multiple check into a separate solve() call with number removal (no is_filled? checks)
-# Test: Can get_next empty be fasteR? --> Start at last filled position! (pass from solve)
 # Test: getting square numbers - Can this be much fasteR? ()
+# Remove possibilities when the number of givens is close to 17? does that even make snse?
+
+# When filling any number, remove it from all positions it cant be in anymore
+# -> Keep a separate copy for checking for multiple solutions, so we can restart with a clean hash
