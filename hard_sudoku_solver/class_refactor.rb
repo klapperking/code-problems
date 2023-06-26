@@ -86,8 +86,8 @@ class SudokuSolver
     return pos
   end
 
-  def is_filled?(puzzle)
-    @puzzle.reverse.each do |row|
+  def filled?(puzzle)
+    puzzle.reverse.each do |row|
       row.each do |num|
         return false if num.zero?
       end
@@ -97,7 +97,7 @@ class SudokuSolver
 
   def solve(prev_row = nil)
     # if solution found, continue searching
-    if is_filled?(@puzzle)
+    if filled?(@puzzle)
       # increment solution_counter
       @solution_counter += 1
 
@@ -164,7 +164,6 @@ def sudoku_solver(puzzle)
 
   solver = SudokuSolver.new(puzzle)
   solver.find_solution()
-  p solver.solution
   return solver.solution
 end
 
@@ -172,9 +171,7 @@ StackProf.run(mode: :cpu, out: 'stackprof.dump') do
   sudoku_solver(puzzle2)
 end
 
-# Refactor Multiple check into a separate solve() call with number removal (no is_filled? checks)
-# Test: getting square numbers - Can this be much fasteR? ()
-# Remove possibilities when the number of givens is close to 17? does that even make snse?
-
-# When filling any number, remove it from all positions it cant be in anymore
-# -> Keep a separate copy for checking for multiple solutions, so we can restart with a clean hash
+# TODO: Refactor for faster solve (esp. for lower amounts of given)
+# Option 1: Major Refactor: Update Possibilty Hash on every filled number to exit faster
+# Option 2: Optimize performance somewhat faster using profiling
+# Option 3: Implement 'Human Logic' to solve after threshold of filled nums
