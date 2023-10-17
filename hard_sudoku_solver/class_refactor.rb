@@ -30,14 +30,14 @@ class SudokuSolver
       (0..8).each do |i_col|
         next unless puzzle[i_row][i_col].zero?
 
-        possibilities["#{i_row}#{i_col}".to_sym] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        possibilities["#{i_row}#{i_col}"] = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
         (0..8).each do |i|
-          possibilities["#{i_row}#{i_col}".to_sym].delete(puzzle[i_row][i])
-          possibilities["#{i_row}#{i_col}".to_sym].delete(puzzle[i][i_col])
+          possibilities["#{i_row}#{i_col}"].delete(puzzle[i_row][i])
+          possibilities["#{i_row}#{i_col}"].delete(puzzle[i][i_col])
         end
 
-        get_square(i_row, i_col).each { |i| possibilities["#{i_row}#{i_col}".to_sym].delete(puzzle[i[0]][i[1]]) }
+        get_square(i_row, i_col).each { |i| possibilities["#{i_row}#{i_col}"].delete(puzzle[i[0]][i[1]]) }
       end
     end
     return possibilities
@@ -58,7 +58,7 @@ class SudokuSolver
   end
 
   def is_possible?(y, x, n)
-    # check row and col
+    # check row and col TODO: Is checking row and col simultaneously faster or slower than consequently
     (0..8).each { |i| return false if @puzzle[y][i] == n || @puzzle[i][x] == n }
 
     # check 3x3
@@ -120,7 +120,8 @@ class SudokuSolver
     i_row, i_col = get_next_empty(prev_row)
 
     # attempt each possibility for given square
-    @base_possibilities["#{i_row}#{i_col}".to_sym].each do |n|
+    @base_possibilities["#{i_row}#{i_col}"].each do |n|
+
       # if possibility can still go into square, fill it and start recursion call
       if is_possible?(i_row, i_col, n)
         @puzzle[i_row][i_col] = n
