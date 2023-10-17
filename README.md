@@ -19,4 +19,8 @@ Each subdirectory here contains the solution attempt of a given kata
       * kata: https://www.codewars.com/kata/52e88b39ffb6ac53a400022e/
       * status: finished
       * comment: non-bitshifting solution (using bitshift and mask is best)
+  4. ruby: Hash.flattened_keys (4kyu)
+      * kata: https://www.codewars.com/kata/521a849a05dd182a09000043
+      * status: finished
+      * comment: poorly ordered solution (pending review)
 ---
