@@ -25,6 +25,6 @@ Each subdirectory here contains the solution attempt of a given kata
       * comment: poorly ordered solution (pending review)
   5. ruby: Break the Caesar! (5kyu)
       * kata: https://www.codewars.com/kata/598e045b8c13926d8c0000e8
-      * status: started
-      * comment: none
+      * status: finished
+      * comment: unimaginative solution with a modulo alphabet rotation
 ---
