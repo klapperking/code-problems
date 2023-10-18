@@ -23,4 +23,8 @@ Each subdirectory here contains the solution attempt of a given kata
       * kata: https://www.codewars.com/kata/521a849a05dd182a09000043
       * status: finished
       * comment: poorly ordered solution (pending review)
+  5. ruby: Break the Caesar! (5kyu)
+      * kata: https://www.codewars.com/kata/598e045b8c13926d8c0000e8
+      * status: started
+      * comment: none
 ---
