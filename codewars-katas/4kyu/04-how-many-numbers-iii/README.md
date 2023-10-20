@@ -1,4 +1,4 @@
-# KATA Information
+# Kata Overview
 
 ---
 
