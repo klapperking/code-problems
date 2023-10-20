@@ -1,2 +1,3 @@
-# Kata Information
+# Kata Overview
+
 ---
