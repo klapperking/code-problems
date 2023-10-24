@@ -13,5 +13,3 @@ def power_sumDigTerm(n)
 
   series.sort[n]
 end
-
-p power_sumDigTerm(1)
