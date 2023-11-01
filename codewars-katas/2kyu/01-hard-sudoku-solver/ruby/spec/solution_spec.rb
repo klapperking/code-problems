@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require_relative '../lib/solution'
+require_relative '../src/solution'
 
 # define two test puzzles
 puzzle = [[0, 0, 6, 1, 0, 0, 0, 0, 8],

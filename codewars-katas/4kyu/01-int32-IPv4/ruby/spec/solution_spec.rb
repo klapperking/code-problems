@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require_relative '../lib/solution'
+require_relative '../src/solution'
 
 RSpec.describe('int32_to_ip') do
   it 'converts an unsigner 32bit integer into IP format string' do

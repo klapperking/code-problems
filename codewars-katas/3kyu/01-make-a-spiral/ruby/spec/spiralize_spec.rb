@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../lib/spiralize'
+require_relative '../src/spiralize'
 
 RSpec.describe('spiralize') do
   it "does not accept input smaller 5" do

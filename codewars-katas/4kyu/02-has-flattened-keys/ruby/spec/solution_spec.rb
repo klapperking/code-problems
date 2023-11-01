@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require_relative '../lib/solution'
+require_relative '../src/solution'
 
 RSpec.describe('flattened_keys') do
   unflat = { a: 1, 'b' => 2, info: { id: 1, 'name' => 'example' } }

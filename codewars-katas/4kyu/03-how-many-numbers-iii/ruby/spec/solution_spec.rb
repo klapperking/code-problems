@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rspec'
-require_relative '../lib/solution'
+require_relative '../src/solution'
 
 describe('How many numbers') do
   describe('Sanity Tests') do
