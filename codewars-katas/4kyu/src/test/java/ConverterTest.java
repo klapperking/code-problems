@@ -2,6 +2,7 @@
 import static org.junit.Assert.*;
 import org.junit.Test;
 import java.lang.Math;
+import com.baseconverter.Converter;
 
 public class ConverterTest {
 

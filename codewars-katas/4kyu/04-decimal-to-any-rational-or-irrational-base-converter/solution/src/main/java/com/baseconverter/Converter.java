@@ -1,3 +1,5 @@
+package com.baseconverter;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +10,7 @@ public class Converter {
 
     // use ASCII table for conversion
     if (i >= 10 && i <= 36) {
-      System.out.println(List.of("Converting", i, "to", String.valueOf((char)(i + 'A'))));
-      return String.valueOf((char)(i + 'A'));
+      return String.valueOf((char) (i + 'A' - 10));
     }
 
     return Integer.toString(i);
@@ -31,13 +32,19 @@ public class Converter {
     int k = (int)((Math.floor(Math.log(n) / Math.log(base))) + 1);
 
     // decreasing k, find the next digit for result and adjust n. Add . when needed to separate before and after comma
-    for (int i = k-1; i > (-1) * decimals - 1; i--) {
+    for (int i = k-1; i > (-1)*decimals - 1; i--) {
       if (result.size() == k) {
         result.add(".");
       }
 
       int digit = (int)(Math.floor(n / Math.pow(base, i)) % base);
       n -= digit * Math.pow(base, i);
+
+      // Just for the difference of 0.1 to .1, only for Kata
+      if (String.join("", result) == "" && digit == 0) {
+        continue;
+      }
+
       result.add(Converter.getStringFromInt(digit));
     }
 
